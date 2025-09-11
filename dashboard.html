@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f3f9;
+      margin: 0;
+    }
+    header {
+      background: #3498db;
+      color: white;
+      padding: 20px;
+      text-align: space-between;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; }
+    button {
+      background: #e74c3c;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #c0392b; }
+    .portfolio {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .card:hover { transform: translateY(-5px); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="welcome">Bienvenido</h1>
+    <button onclick="logout()">Salir</button>
+  </header>
+  <div class="portfolio">
+    <div class="card">📂 Proyecto 1</div>
+    <div class="card">📂 Proyecto 2</div>
+    <div class="card">📂 Proyecto 3</div>
+    <div class="card">📂 Proyecto 4</div>
+  </div>
+
+  <script>
+    const user = localStorage.getItem("user") || "Invitado";
+    document.getElementById("welcome").innerText = "Bienvenido, " + user;
+
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
