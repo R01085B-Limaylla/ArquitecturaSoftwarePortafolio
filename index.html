@@ -22,65 +22,20 @@
       text-align: center;
       animation: fadeIn 0.6s ease-in-out;
     }
-    .container h2 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-    input {
-      width: 90%;
-      padding: 12px;
-      margin: 12px 0;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
-    input:focus {
-      border-color: #3498db;
-      outline: none;
-      box-shadow: 0 0 8px rgba(52,152,219,0.5);
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+    .container h2 { margin-bottom: 20px; color: #333; }
+    input { width: 90%; padding: 12px; margin: 12px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+    input:focus { border-color: #3498db; outline: none; box-shadow: 0 0 8px rgba(52,152,219,0.5); }
+    button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; transition: 0.3s; }
     button:hover { transform: scale(1.05); }
     .btn-login { background: #3498db; color: white; }
     .btn-register { background: #2ecc71; color: white; }
     .btn-guest { background: #95a5a6; color: white; }
 
-    /* Animación */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Toasts */
-    #alert {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 15px 20px;
-      border-radius: 10px;
-      color: white;
-      font-weight: bold;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      animation: slideIn 0.5s ease-in-out;
-      z-index: 1000;
-    }
+    #alert { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 10px; color: white; font-weight: bold; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; }
     .success { background: #2ecc71; }
     .error { background: #e74c3c; }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(100%); }
-      to { opacity: 1; transform: translateX(0); }
-    }
   </style>
 </head>
 <body>
@@ -96,55 +51,34 @@
   <div id="alert"></div>
 
   <script>
-    const API_URL = "http://localhost:3000"; // tu backend
+    const API_URL = "http://localhost:3000";
 
     function showAlert(message, type) {
       const alertBox = document.getElementById("alert");
       alertBox.innerText = message;
       alertBox.className = type === "success" ? "success" : "error";
       alertBox.style.display = "block";
-      setTimeout(() => {
-        alertBox.style.display = "none";
-      }, 2500);
+      setTimeout(() => alertBox.style.display = "none", 2500);
     }
 
     async function login() {
       const username = document.getElementById("username").value;
       const password = document.getElementById("password").value;
 
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
 
-        if (!res.ok) {
-          showAlert(`❌ ${data.message}`, "error");
-        } else {
-          showAlert(`✅ ${data.message}`, "success");
-          localStorage.setItem("user", data.user.username);
-          setTimeout(() => {
-            window.location.href = "dashboard.html";
-          }, 1500);
-        }
-      } catch (err) {
-        showAlert("❌ Error al conectar con el servidor", "error");
+      if (!res.ok) {
+        showAlert(`❌ ${data.message}`, "error");
+      } else {
+        showAlert(`✅ ${data.message}`, "success");
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setTimeout(() => window.location.href = "dashboard.html", 1500);
       }
     }
 
-    function goRegister() {
-      window.location.href = "register.html";
-    }
-
-    function guest() {
-      showAlert("👤 Entrando como invitado...", "success");
-      localStorage.setItem("user", "Invitado");
-      setTimeout(() => {
-        window.location.href = "dashboard.html";
-      }, 1000);
-    }
-  </script>
-</body>
-</html>
+    function goRegister() { window.location.href = "registe
