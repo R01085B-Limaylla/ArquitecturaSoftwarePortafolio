@@ -15,6 +15,12 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Servir archivos estáticos (frontend en carpeta public)
 app.use(express.static("public"));
 
+// Servir index.html en la raíz
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+
 // 👇 Servir archivos subidos (carpeta uploads)
 app.use("/uploads", express.static("uploads"));
 
@@ -226,5 +232,5 @@ app.post("/guest", (req, res) => {
 });
 
 // ==================== INICIAR SERVIDOR ====================
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`));
