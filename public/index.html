@@ -62,23 +62,61 @@
     }
 
     async function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-      const res = await fetch(`${API_URL}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
+      if (!username || !password) {
+        showAlert("❌ Por favor completa todos los campos", "error");
+        return;
+      }
 
-      if (!res.ok) {
-        showAlert(`❌ ${data.message}`, "error");
-      } else {
-        showAlert(`✅ ${data.message}`, "success");
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setTimeout(() => window.location.href = "dashboard.html", 1500);
+      try {
+        const res = await fetch(`${API_URL}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showAlert(`❌ ${data.message}`, "error");
+        } else {
+          localStorage.setItem("username", data.user.username);
+          localStorage.setItem("role", data.user.role);
+          showAlert(`✅ ${data.message}`, "success");
+          setTimeout(() => window.location.href = "dashboard.html", 1500);
+        }
+      } catch (error) {
+        showAlert("❌ Error de conexión al servidor", "error");
+        console.error(error);
       }
     }
 
-    function goRegister() { window.location.href = "registe
+    function goRegister() {
+      window.location.href = "register.html";
+    }
+
+    async function guest() {
+  try {
+    const res = await fetch(`${API_URL}/guest`, { 
+      method: "POST", 
+      credentials: "include" // importante para guardar la sesión
+    });
+    const data = await res.json();
+
+    // Guardar datos en localStorage si quieres
+    localStorage.setItem("username", data.user.username);
+    localStorage.setItem("role", data.user.role);
+
+    window.location.href = "dashboard.html";
+  } catch (error) {
+    showAlert("❌ Error al entrar como invitado", "error");
+    console.error(error);
+  }
+}
+
+  </script>
+</body>
+</html>
