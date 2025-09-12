@@ -7,6 +7,7 @@ const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,21 +31,23 @@ app.use(session({
   }
 }));
 
-// ✅ Conexión a MySQL
+// ✅ Conexión a MySQL en Railway
 const db = mysql.createConnection({
-  host: "localhost",
+  host: "switchyard.proxy.rlwy.net",
+  port: 35044,
   user: "root",
-  password: "sebas123", // cámbialo si usas otra clave
-  database: "login_app"
+  password: "uUqGzWnifpPkvcATNRqqQnFGPckpqIqv", 
+  database: "railway"
 });
 
 db.connect(err => {
   if (err) {
-    console.log("❌ Error al conectar a MySQL:", err);
+    console.log("❌ Error al conectar a MySQL Railway:", err);
   } else {
-    console.log("✅ Conectado a MySQL");
+    console.log("✅ Conectado a MySQL Railway");
   }
 });
+
 
 // 📂 Configuración de Multer (subida de archivos)
 const storage = multer.diskStorage({
