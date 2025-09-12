@@ -37,14 +37,15 @@ app.use(session({
   }
 }));
 
-// ✅ Conexión a MySQL en Railway
+// ✅ Conexión a MySQL en Railway usando variables de entorno
 const db = mysql.createConnection({
-  host: "switchyard.proxy.rlwy.net",
-  port: 35044,
-  user: "root",
-  password: "uUqGzWnifpPkvcATNRqqQnFGPckpqIqv", 
-  database: "railway"
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
+
 
 db.connect(err => {
   if (err) {
