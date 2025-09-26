@@ -1,122 +1,264 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Login App</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #3498db, #8e44ad);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portafolio | Sebastian Limaylla – Arquitectura de Software</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="uploads/LogoUpla.png" href="https://test.upla.edu.pe/assets/logoBlanco-Dz4ZquNa.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/idb-keyval@6/dist/umd.js"></script>
+  <!-- PDF.js para miniaturas reales de PDFs (misma ruta/origen) -->
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    if (window['pdfjsLib']) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
     }
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-      width: 350px;
-      text-align: center;
-      animation: fadeIn 0.6s ease-in-out;
-    }
-    .container h2 { margin-bottom: 20px; color: #333; }
-    input { width: 90%; padding: 12px; margin: 12px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
-    input:focus { border-color: #3498db; outline: none; box-shadow: 0 0 8px rgba(52,152,219,0.5); }
-    button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 10px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-    button:hover { transform: scale(1.05); }
-    .btn-login { background: #3498db; color: white; }
-    .btn-register { background: #2ecc71; color: white; }
-    .btn-guest { background: #95a5a6; color: white; }
-
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-    #alert { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 10px; color: white; font-weight: bold; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; }
-    .success { background: #2ecc71; }
-    .error { background: #e74c3c; }
-  </style>
+  </script>
 </head>
 <body>
-  <div class="container">
-    <h2>🔐 Bienvenido</h2>
-    <input type="text" id="username" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button class="btn-login" onclick="login()">Iniciar Sesión</button>
-    <button class="btn-register" onclick="goRegister()">Registrar</button>
-    <button class="btn-guest" onclick="guest()">Entrar como Invitado</button>
+
+  <!-- Sidebar principal -->
+<aside class="sidebar glass">
+  <div class="sidebar__brand">
+  <!-- Logo / espacio para logo -->
+  <img src="uploads/LogoUpla.png" alt="Logo UPLA"
+       onerror="this.style.display='none'"
+       style="width:48px; height:48px; object-fit:contain; border-radius:10px; background:rgba(255,255,255,.08);" />
+
+  <div>
+    <h1 class="sidebar__title">Universidad Peruana<br>Los Andes</h1>
+    <h1 class="sidebar__title mt-1">Sebastian Limaylla</h1>
+    <p class="sidebar__subtitle">Arquitectura de Software</p>
+  </div>
+</div>
+
+  <nav class="sidebar__nav">
+    <button class="btn btn-ghost" data-nav="portfolio">
+      <span class="sidebar__icon">📁</span> Portafolio
+    </button>
+    <button class="btn btn-ghost" data-nav="profile">
+      <span class="sidebar__icon">👤</span> Perfil
+    </button>
+  </nav>
+
+  <div class="sidebar__footer">
+    <button class="btn btn-primary w-full" id="btn-login">Iniciar sesión</button>
+    <button class="btn btn-ghost w-full hidden" id="btn-logout">Cerrar sesión</button>
+  </div>
+</aside>
+
+<!-- Sidebar secundaria (solo Portafolio) -->
+<aside class="sidebar-2 glass" id="sidebar-weeks" style="display:none;">
+  <div class="sidebar2__head">
+    <div class="left">
+      <h2>Semanas</h2>
+      <span class="muted">1–16</span>
+    </div>
+    <span class="chev" id="wk-toggle">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <path d="M8 10l4 4 4-4" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </div>
+  <nav class="sidebar2__nav" id="weeks-nav"></nav>
+  <div class="sidebar2__files" id="weeks-files"></div>
+</aside>
+
+  <!-- Main -->
+  <main class="with-sidebar max-w-7xl mx-auto px-4 lg:px-6 py-8" id="app-main">
+  <!-- PORTFOLIO -->
+<section id="view-portfolio" class="space-y-6">
+  <div class="flex items-center justify-between gap-4">
+    <h2 class="text-2xl font-semibold">Dashboard</h2>
   </div>
 
-  <div id="alert"></div>
+  <!-- ✨ Grid visible para TODOS (sin login) -->
+  <div id="files-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
 
-  <script>
-    const API_URL = "https://arquitecturasoftwareportafolio.onrender.com";
+        
+        <div id="admin-tools" class="hidden card">
+          <!-- Grid central donde se muestran los archivos de la semana seleccionada -->
+<div id="files-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="tag">Admin</span>
+            <button id="btn-pick-folder" class="btn btn-ghost text-xs">Elegir carpeta (uploads/)</button>
+            <span id="folder-status" class="text-xs text-slate-400">Sin carpeta</span>
+          </div>
+          <form id="upload-form" class="grid sm:grid-cols-5 gap-2">
+            <input id="title-input" type="text" placeholder="Título" class="sm:col-span-2 rounded-xl bg-white/5 border border-white/10 px-3 py-2" required />
+            <select id="week-select" class="rounded-xl bg-white/5 border border-white/10 px-3 py-2" required></select>
+            <input id="file-input" type="file" accept="image/*,application/pdf" class="sm:col-span-2 rounded-xl bg-white/5 border border-white/10 px-3 py-2" required />
+            <button class="btn btn-primary sm:col-span-5 justify-center" type="submit">Subir</button>
+          </form>
+          <p class="text-xs text-slate-400 mt-1">Con carpeta conectada, se guardan los archivos y se actualiza <code>uploads/index.json</code> automáticamente.</p>
+        </div>
+      </div>
+      <div id="weeks-accordion" class="space-y-3"></div>
+    </section>
 
-    function showAlert(message, type) {
-      const alertBox = document.getElementById("alert");
-      alertBox.innerText = message;
-      alertBox.className = type === "success" ? "success" : "error";
-      alertBox.style.display = "block";
-      setTimeout(() => alertBox.style.display = "none", 2500);
-    }
+    <section id="view-profile" class="hidden space-y-6">
+  <!-- Hero -->
+  <div class="profile-hero card overflow-hidden p-0">
+    <div class="profile-cover"></div>
 
-    async function login() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+    <div class="p-6 lg:p-8">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+        <img
+          src="uploads/profile.jpg"
+          alt="Foto de Sebastian Limaylla"
+          class="profile-avatar"
+          onerror="this.src='https://ui-avatars.com/api/?name=Sebastian+Limaylla&background=1b2a4b&color=fff&size=256'"
+        />
 
-      if (!username || !password) {
-        showAlert("❌ Por favor completa todos los campos", "error");
-        return;
-      }
+        <div class="flex-1">
+          <div class="flex items-center gap-3 flex-wrap">
+            <h2 class="text-3xl font-bold leading-tight">Sebastian Limaylla</h2>
+            <span class="chip chip-primary">Arquitectura de Software</span>
+            <span class="chip">2025-II</span>
+          </div>
+          <p class="mt-2 text-slate-300 max-w-3xl">
+            Estudiante de ingeniería de Sistemas con enfoque en desarrollo web,
+            diseño de soluciones escalables y buenas prácticas de ingeniería.
+            Interesado en patrones de arquitectura, DevOps y experiencia de usuario.
+          </p>
 
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ username, password })
-        });
+          <!-- Redes -->
+          <div class="mt-4 flex items-center gap-2 flex-wrap">
+            <a class="btn btn-social" href="https://github.com/r01085b-limaylla" target="_blank" rel="noopener">
+              <!-- GitHub icon -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.24c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.1-.75.08-.74.08-.74 1.21.09 1.85 1.25 1.85 1.25 1.08 1.85 2.84 1.32 3.53 1.01.11-.79.42-1.32.77-1.62-2.67-.3-5.47-1.34-5.47-5.96 0-1.32.47-2.4 1.24-3.24-.12-.3-.54-1.52.12-3.16 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.64.24 2.86.12 3.16.77.84 1.24 1.92 1.24 3.24 0 4.63-2.81 5.66-5.49 5.96.43.37.82 1.1.82 2.22v3.29c0 .32.21.69.83.57A12 12 0 0 0 12 .5Z"/></svg>
+              GitHub
+            </a>
+            <a class="btn btn-social" href="https://www.linkedin.com/in/tuusuario" target="_blank" rel="noopener">
+              <!-- LinkedIn icon -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5 2.5 2.5 0 0 1 4.98 3.5zM3 9h4v12H3zM9 9h3.8v1.64h.05A4.17 4.17 0 0 1 17 8.74C20.2 8.74 21 10.82 21 14.06V21h-4v-6.02c0-1.44-.02-3.29-2-3.29-2 0-2.31 1.56-2.31 3.19V21H9z"/></svg>
+              LinkedIn
+            </a>
+            <a class="btn btn-social" href="mailto:tucorreo@ejemplo.com">
+              <!-- Mail icon -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5Z"/></svg>
+              Email
+            </a>
+            <a class="btn btn-social" href="https://twitter.com/tuusuario" target="_blank" rel="noopener">
+              <!-- X/Twitter icon -->
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.3 3H20l-6.5 7.4L21.5 21H15l-4.6-5.6L5 21H2.3l7.1-8.1L2.9 3H9l4.1 5L17.3 3Zm-2.3 16h1.7L9.4 5H7.6l7.4 14Z"/></svg>
+              X
+            </a>
+            <!-- agrega más si quieres -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        const data = await res.json();
+  <!-- Capacidades / Badges -->
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="card">
+      <h3 class="text-sm uppercase tracking-wider text-slate-400">Capacidades</h3>
+      <ul class="mt-3 space-y-2 text-slate-200">
+        <li>Diseño de arquitectura (capas, microservicios, DDD)</li>
+        <li>Buenas prácticas: SOLID, Clean Code</li>
+        <li>CI/CD básico (GitHub Actions)</li>
+        <li>Modelado de API REST</li>
+      </ul>
+    </div>
 
-        if (!res.ok) {
-          showAlert(`❌ ${data.message}`, "error");
-        } else {
-          localStorage.setItem("username", data.user.username);
-          localStorage.setItem("role", data.user.role);
-          showAlert(`✅ ${data.message}`, "success");
-          setTimeout(() => window.location.href = "dashboard.html", 1500);
-        }
-      } catch (error) {
-        showAlert("❌ Error de conexión al servidor", "error");
-        console.error(error);
-      }
-    }
+    <div class="card">
+      <h3 class="text-sm uppercase tracking-wider text-slate-400">Tecnologías</h3>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <span class="chip">HTML</span>
+        <span class="chip">CSS/Tailwind</span>
+        <span class="chip">JavaScript</span>
+        <span class="chip">IndexedDB</span>
+        <span class="chip">PDF.js</span>
+        <span class="chip">Git/GitHub</span>
+      </div>
+    </div>
 
-    function goRegister() {
-      window.location.href = "register.html";
-    }
+    <div class="card">
+      <h3 class="text-sm uppercase tracking-wider text-slate-400">Intereses</h3>
+      <div class="mt-3 flex flex-wrap gap-2">
+        <span class="chip">Arquitecturas escalables</span>
+        <span class="chip">Patrones</span>
+        <span class="chip">DevOps</span>
+        <span class="chip">Frontend UX</span>
+      </div>
+    </div>
+  </div>
 
-    async function guest() {
-  try {
-    const res = await fetch(`${API_URL}/guest`, { 
-      method: "POST", 
-      credentials: "include" // importante para guardar la sesión
-    });
-    const data = await res.json();
+  <!-- Timeline simple -->
+  <div class="card">
+    <h3 class="text-sm uppercase tracking-wider text-slate-400">Resumen</h3>
+    <div class="mt-4 space-y-4">
+      <div class="timeline-item">
+        <div class="dot"></div>
+        <div>
+          <div class="font-semibold">Portafolio – Arquitectura de Software</div>
+          <div class="text-xs text-slate-400">2025-II · Gestión por semanas, PDF/Imágenes, CRUD local</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="dot"></div>
+        <div>
+          <div class="font-semibold">Proyectos personales web</div>
+          <div class="text-xs text-slate-400">HTML, Tailwind, JS; organización con Git/GitHub</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    // Guardar datos en localStorage si quieres
-    localStorage.setItem("username", data.user.username);
-    localStorage.setItem("role", data.user.role);
 
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    showAlert("❌ Error al entrar como invitado", "error");
-    console.error(error);
-  }
-}
+  <!-- Login Modal -->
+  <div id="modal-login" class="modal-backdrop">
+    <div class="modal">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold">Iniciar sesión (Admin)</h3>
+        <button class="btn btn-ghost" data-close>✕</button>
+      </div>
+      <form id="login-form" class="space-y-3">
+        <input id="login-user" type="text" placeholder="Usuario" value="admin" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2" />
+        <input id="login-pass" type="password" placeholder="Contraseña" class="w-full rounded-xl bg-white/5 border border-white/10 px-4 py-2" />
+        
+        <button class="btn btn-primary w-full" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
 
-  </script>
+  <!-- Preview Modal -->
+  <div id="modal-preview" class="modal-backdrop">
+    <div class="modal max-w-4xl">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-lg font-semibold">Vista previa</h3>
+        <button class="btn btn-ghost" data-close>✕</button>
+      </div>
+      <div id="preview-container" class="h-[70vh] rounded-xl overflow-hidden bg-white/5 border border-white/10"></div>
+    </div>
+  </div>
+
+  <!-- Card Template -->
+  <template id="card-template">
+    <div class="card group">
+      <div class="aspect-video rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center relative">
+        <img class="w-full h-full object-cover hidden" data-role="thumb" alt="thumb" />
+        <div class="absolute inset-0 hidden items-center justify-center text-4xl" data-role="pdfcover">📄</div>
+      </div>
+      <div class="mt-3 flex items-start justify-between gap-3">
+        <div>
+          <div class="font-semibold line-clamp-1" data-role="title"></div>
+          <div class="text-xs text-slate-400 mt-0.5" data-role="meta"></div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button class="btn btn-ghost px-2 py-1 text-xs" data-action="preview">Ver</button>
+          <a class="btn btn-ghost px-2 py-1 text-xs" data-role="download" download>Descargar</a>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script src="script.js"></script>
 </body>
 </html>
+
